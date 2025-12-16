@@ -84,6 +84,9 @@ export default function HistoryPage() {
   const trades = demoMode ? (demoData?.trades || []) : (tradesData?.trades || []);
   const positions = demoMode ? (demoData?.positions || []) : (positionsData?.positions || []);
   
+  // State for current prices (MUST be declared before useMemo that uses it!)
+  const [currentPrices, setCurrentPrices] = useState({});
+  
   // Generate snapshots from trades for both demo and real mode
   const snapshots = useMemo(() => {
     // Guard: Return empty if data not ready
@@ -182,8 +185,6 @@ export default function HistoryPage() {
   ])];
 
   // Fetch current prices for all symbols
-  const [currentPrices, setCurrentPrices] = useState({});
-
   useEffect(() => {
     const fetchPrices = async () => {
       const prices = {};
