@@ -79,10 +79,10 @@ export default function HistoryPage() {
     user && !demoMode ? { positions: { $: { where: { id: user.id } } } } : null
   );
 
-  const userProfile = demoMode ? demoData : userData?.users?.[0];
-  const initialBalance = demoMode ? (demoData.initialBalance || 10000) : (userProfile?.initialBalance || 10000);
-  const trades = demoMode ? (demoData.trades || []) : (tradesData?.trades || []);
-  const positions = demoMode ? (demoData.positions || []) : (positionsData?.positions || []);
+  const userProfile = demoMode ? demoData : (userData?.users?.[0] || null);
+  const initialBalance = demoMode ? (demoData?.initialBalance || 10000) : (userProfile?.initialBalance || 10000);
+  const trades = demoMode ? (demoData?.trades || []) : (tradesData?.trades || []);
+  const positions = demoMode ? (demoData?.positions || []) : (positionsData?.positions || []);
   
   // Generate snapshots from trades for both demo and real mode
   const snapshots = useMemo(() => {
@@ -177,8 +177,8 @@ export default function HistoryPage() {
 
   // Get unique symbols from positions and trades
   const symbols = [...new Set([
-    ...positions.map(p => p.symbol),
-    ...trades.map(t => t.symbol),
+    ...(positions || []).map(p => p?.symbol).filter(Boolean),
+    ...(trades || []).map(t => t?.symbol).filter(Boolean),
   ])];
 
   // Fetch current prices for all symbols
