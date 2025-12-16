@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../context/LanguageContext';
 import db from '../../lib/instantdb';
@@ -85,7 +85,7 @@ export default function HistoryPage() {
   const positions = demoMode ? (demoData.positions || []) : (positionsData?.positions || []);
   
   // Generate snapshots from trades for both demo and real mode
-  const snapshots = (() => {
+  const snapshots = useMemo(() => {
     // Try to use existing snapshots from DB first (real mode only)
     if (!demoMode && snapshotsData?.portfolioSnapshots && snapshotsData.portfolioSnapshots.length > 0) {
       return snapshotsData.portfolioSnapshots;
@@ -168,7 +168,7 @@ export default function HistoryPage() {
     });
     
     return snaps;
-  })();
+  }, [trades, initialBalance, currentPrices, demoMode, snapshotsData]);
 
   // Get unique symbols from positions and trades
   const symbols = [...new Set([
