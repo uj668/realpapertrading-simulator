@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSimulation } from '../../context/SimulationContext';
@@ -12,7 +12,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Ca
 import { formatCurrency, formatNumber, calculateNewAvgCost } from '../../utils/calculations';
 import { format } from 'date-fns';
 
-export default function TradePage() {
+function TradePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useLanguage();
@@ -414,6 +414,14 @@ export default function TradePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function TradePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p>Loading...</p></div>}>
+      <TradePageContent />
+    </Suspense>
   );
 }
 
