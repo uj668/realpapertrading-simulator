@@ -83,43 +83,50 @@ export default function HistoryPage() {
   const trades = demoMode ? (demoData.trades || []) : (tradesData?.trades || []);
   const positions = demoMode ? (demoData.positions || []) : (positionsData?.positions || []);
   
-  // Create snapshots from demo data if in demo mode
-  const snapshots = demoMode 
-    ? (() => {
-        if (trades.length === 0) return [];
-        
-        // Add initial snapshot (starting point)
-        const snaps = [{
-          timestamp: trades[0].timestamp - 1000, // 1 second before first trade
-          totalValue: initialBalance,
-          cash: initialBalance,
-          positionsValue: 0,
-        }];
-        
-        // Add snapshot for each trade
-        trades.forEach((trade, index) => {
-          const tradesUpToNow = trades.slice(0, index + 1);
-          const cashSpent = tradesUpToNow.reduce((sum, t) => {
-            return sum + (t.type === 'BUY' ? -t.totalAmount : t.totalAmount);
-          }, 0);
-          const currentCash = initialBalance + cashSpent;
-          
-          // Estimate positions value (simplified)
-          const positionsValue = tradesUpToNow.reduce((sum, t) => {
-            return sum + (t.type === 'BUY' ? t.totalAmount : -t.totalAmount);
-          }, 0);
-          
-          snaps.push({
-            timestamp: trade.timestamp,
-            totalValue: currentCash + positionsValue,
-            cash: currentCash,
-            positionsValue: positionsValue,
-          });
-        });
-        
-        return snaps;
-      })()
-    : (snapshotsData?.portfolioSnapshots || []);
+  // Generate snapshots from trades for both demo and real mode
+  const snapshots = (() => {
+    // Try to use existing snapshots from DB first (real mode only)
+    if (!demoMode && snapshotsData?.portfolioSnapshots && snapshotsData.portfolioSnapshots.length > 0) {
+      return snapshotsData.portfolioSnapshots;
+    }
+    
+    // Generate snapshots from trades if none exist or in demo mode
+    if (trades.length === 0) return [];
+    
+    // Add initial snapshot (starting point)
+    const snaps = [{
+      timestamp: trades[trades.length - 1].timestamp - 1000, // 1 second before first trade
+      totalValue: initialBalance,
+      cash: initialBalance,
+      positionsValue: 0,
+    }];
+    
+    // Sort trades by timestamp (oldest first)
+    const sortedTrades = [...trades].sort((a, b) => a.timestamp - b.timestamp);
+    
+    // Add snapshot for each trade
+    sortedTrades.forEach((trade, index) => {
+      const tradesUpToNow = sortedTrades.slice(0, index + 1);
+      const cashSpent = tradesUpToNow.reduce((sum, t) => {
+        return sum + (t.type === 'BUY' ? -t.totalAmount : t.totalAmount);
+      }, 0);
+      const currentCash = initialBalance + cashSpent;
+      
+      // Estimate positions value (simplified - sum of all purchases minus sales)
+      const positionsValue = tradesUpToNow.reduce((sum, t) => {
+        return sum + (t.type === 'BUY' ? t.totalAmount : -t.totalAmount);
+      }, 0);
+      
+      snaps.push({
+        timestamp: trade.timestamp,
+        totalValue: currentCash + positionsValue,
+        cash: currentCash,
+        positionsValue: positionsValue,
+      });
+    });
+    
+    return snaps;
+  })();
 
   // Get unique symbols from positions and trades
   const symbols = [...new Set([
