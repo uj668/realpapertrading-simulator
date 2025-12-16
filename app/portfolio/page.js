@@ -55,6 +55,7 @@ export default function PortfolioPage() {
   const [demoData, setDemoData] = useState({
     cash: 10000,
     initialBalance: 10000,
+    totalDeposits: 0,
     positions: [],
   });
 
@@ -70,6 +71,7 @@ export default function PortfolioPage() {
   const userProfile = demoMode ? demoData : userData?.users?.[0];
   const cash = demoMode ? demoData.cash : (userProfile?.currentCash || 10000);
   const initialBalance = demoMode ? demoData.initialBalance : (userProfile?.initialBalance || 10000);
+  const totalDeposits = demoMode ? (demoData.totalDeposits || 0) : (userProfile?.totalDeposits || 0);
 
   // Fetch current or historical prices for all positions
   const fetchPrices = async () => {
@@ -146,18 +148,22 @@ export default function PortfolioPage() {
       if (demoMode) {
         // Update demo mode data in localStorage
         const newCash = cash + amount;
+        const newTotalDeposits = (totalDeposits || 0) + amount;
         const updatedDemoData = {
           ...demoData,
           cash: newCash,
+          totalDeposits: newTotalDeposits,
         };
         setDemoData(updatedDemoData);
         localStorage.setItem('demoData', JSON.stringify(updatedDemoData));
       } else {
         // Update InstantDB
         const newCash = cash + amount;
+        const newTotalDeposits = (totalDeposits || 0) + amount;
         await db.transact([
           db.tx.users[user.id].update({
             currentCash: newCash,
+            totalDeposits: newTotalDeposits,
           }),
         ]);
       }
@@ -270,6 +276,7 @@ export default function PortfolioPage() {
             totalValue={totalValue}
             initialBalance={initialBalance}
             positionsValue={positionsValue}
+            totalDeposits={totalDeposits}
           />
         </div>
 

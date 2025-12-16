@@ -116,6 +116,8 @@ export const translations = {
     adding: 'Adding...',
     fundsAdded: 'Funds added successfully!',
     addFundsInfo: 'This is virtual money for paper trading practice. Add any amount you want to test your trading strategies.',
+    totalDeposited: 'Total Deposited',
+    totalInvested: 'Total Invested',
     
     // Time Travel / Simulation
     simulationDate: 'Simulation Date',
@@ -249,6 +251,8 @@ export const translations = {
     adding: 'Pridedama...',
     fundsAdded: 'Lėšos sėkmingai pridėtos!',
     addFundsInfo: 'Tai virtualūs pinigai praktikai prekiauti. Pridėkite bet kokią sumą, kurią norite, kad išbandytumėte savo prekybos strategijas.',
+    totalDeposited: 'Iš viso įnešta',
+    totalInvested: 'Iš viso investuota',
     
     // Time Travel / Simulation
     simulationDate: 'Simuliacijos data',

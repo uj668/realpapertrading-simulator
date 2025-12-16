@@ -69,6 +69,7 @@ export default function InitializeProfilePage() {
           username: username || user.email.split('@')[0],
           initialBalance: 10000,
           currentCash: 10000,
+          totalDeposits: 0,
           createdAt: Date.now(),
         }),
       ]);
