@@ -32,6 +32,17 @@ export default function InitializeProfilePage() {
     }
   }, [user]);
 
+  // Auto-redirect if profile already exists
+  useEffect(() => {
+    if (!dataLoading && userData?.users?.[0]) {
+      const existingProfile = userData.users[0];
+      if (existingProfile.initialBalance && existingProfile.username) {
+        console.log('Profile already exists, redirecting to portfolio...');
+        router.push('/portfolio');
+      }
+    }
+  }, [userData, dataLoading, router]);
+
   const handleInitialize = async (e) => {
     e.preventDefault();
     setError('');
@@ -159,23 +170,6 @@ export default function InitializeProfilePage() {
                 </Button>
               </form>
             )}
-
-            <div className="mt-6 p-4 bg-gray-50 rounded">
-              <h4 className="font-semibold text-gray-900 mb-2 text-sm">
-                Debug Info:
-              </h4>
-              <div className="text-xs font-mono text-gray-600 space-y-1">
-                <div>User ID: {user.id}</div>
-                <div>Email: {user.email}</div>
-                <div>Profile Exists: {userData?.users?.[0] ? 'Yes' : 'No'}</div>
-                {userData?.users?.[0] && (
-                  <>
-                    <div>Username: {userData.users[0].username || 'Not set'}</div>
-                    <div>Balance: €{userData.users[0].initialBalance || 'Not set'}</div>
-                  </>
-                )}
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
