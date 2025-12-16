@@ -89,7 +89,7 @@ export default function AddFundsModal({ isOpen, onClose, onAddFunds, currentBala
                     key={quickAmount}
                     type="button"
                     onClick={() => setAmount(quickAmount.toString())}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-gray-900 bg-white border-2 border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 hover:text-blue-700 transition-colors"
                   >
                     €{quickAmount}
                   </button>
