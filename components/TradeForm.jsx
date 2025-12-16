@@ -6,7 +6,7 @@ import { useSimulation } from '../context/SimulationContext';
 import { Button } from './ui/Button';
 import { Input, Label } from './ui/Input';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
-import { getQuote } from '../lib/twelveData';
+import { getQuote } from '../lib/alphaVantage';
 import { formatCurrency, formatNumber, calculateSharesFromAmount, calculateTotalCost } from '../utils/calculations';
 import { format } from 'date-fns';
 

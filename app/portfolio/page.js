@@ -6,7 +6,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useSimulation } from '../../context/SimulationContext';
 import { useAutoRefresh } from '../../hooks/useAutoRefresh';
 import { usePortfolioSnapshot } from '../../hooks/usePortfolioSnapshot';
-import { getQuote } from '../../lib/twelveData';
+import { getQuote } from '../../lib/alphaVantage';
 import db from '../../lib/instantdb';
 import Navbar from '../../components/Navbar';
 import PortfolioSummary from '../../components/PortfolioSummary';

@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useLanguage } from '../context/LanguageContext';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
 import { Select } from './ui/Select';
-import { getTimeSeries } from '../lib/twelveData';
+import { getTimeSeries } from '../lib/alphaVantage';
 import { formatCurrency } from '../utils/calculations';
 import { format } from 'date-fns';
 
