@@ -11,9 +11,11 @@ import db from '../../lib/instantdb';
 import Navbar from '../../components/Navbar';
 import PortfolioSummary from '../../components/PortfolioSummary';
 import PositionCard from '../../components/PositionCard';
+import AddFundsModal from '../../components/AddFundsModal';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { formatDistance, format as formatDate } from 'date-fns';
+import { id } from '@instantdb/react';
 
 export default function PortfolioPage() {
   const router = useRouter();
@@ -38,6 +40,8 @@ export default function PortfolioPage() {
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Fetch user data and positions from InstantDB (skip in demo mode)
   const { data: userData } = db.useQuery(
@@ -137,6 +141,36 @@ export default function PortfolioPage() {
   // Save portfolio snapshot
   usePortfolioSnapshot(user?.id, totalValue, cash, positionsValue);
 
+  // Handle adding funds
+  const handleAddFunds = async (amount) => {
+    try {
+      if (demoMode) {
+        // Update demo mode data in localStorage
+        const newCash = cash + amount;
+        const updatedDemoData = {
+          ...demoData,
+          cash: newCash,
+        };
+        setDemoData(updatedDemoData);
+        localStorage.setItem('demoData', JSON.stringify(updatedDemoData));
+      } else {
+        // Update InstantDB
+        const newCash = cash + amount;
+        await db.transact([
+          db.tx.users[user.id].update({
+            currentCash: newCash,
+          }),
+        ]);
+      }
+      
+      setSuccessMessage(t('fundsAdded'));
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error adding funds:', error);
+      throw error;
+    }
+  };
+
   // Redirect if not authenticated (skip check in demo mode)
   useEffect(() => {
     if (!demoMode && !authLoading && !user) {
@@ -178,11 +212,30 @@ export default function PortfolioPage() {
           </div>
         )}
 
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-sm font-medium text-green-800">
+              ✅ {successMessage}
+            </p>
+          </div>
+        )}
+
         {/* Header with Controls */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">{t('portfolio')}</h1>
           
           <div className="flex items-center space-x-4">
+            {/* Add Funds Button */}
+            <Button
+              onClick={() => setAddFundsModalOpen(true)}
+              variant="success"
+              size="sm"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              💰 {t('addFunds')}
+            </Button>
+
             {/* Auto-refresh Toggle */}
             <label className="flex items-center space-x-2 cursor-pointer">
               <input
@@ -255,6 +308,14 @@ export default function PortfolioPage() {
           )}
         </div>
       </main>
+
+      {/* Add Funds Modal */}
+      <AddFundsModal
+        isOpen={addFundsModalOpen}
+        onClose={() => setAddFundsModalOpen(false)}
+        onAddFunds={handleAddFunds}
+        currentBalance={cash}
+      />
     </div>
   );
 }

@@ -105,6 +105,18 @@ export const translations = {
     to: 'To',
     initial: 'Initial',
     
+    // Add Funds
+    addFunds: 'Add Funds',
+    amountToAdd: 'Amount to Add',
+    currentBalance: 'Current Balance',
+    quickAmounts: 'Quick Amounts',
+    invalidAmount: 'Please enter a valid amount',
+    amountTooLarge: 'Amount must be less than €1,000,000',
+    errorAddingFunds: 'Error adding funds',
+    adding: 'Adding...',
+    fundsAdded: 'Funds added successfully!',
+    addFundsInfo: 'This is virtual money for paper trading practice. Add any amount you want to test your trading strategies.',
+    
     // Time Travel / Simulation
     simulationDate: 'Simulation Date',
     historical: 'Historical',
@@ -225,6 +237,18 @@ export const translations = {
     from: 'Nuo',
     to: 'Iki',
     initial: 'Pradinis',
+    
+    // Add Funds
+    addFunds: 'Pridėti lėšų',
+    amountToAdd: 'Pridedama suma',
+    currentBalance: 'Dabartinis balansas',
+    quickAmounts: 'Greitos sumos',
+    invalidAmount: 'Įveskite teisingą sumą',
+    amountTooLarge: 'Suma turi būti mažesnė nei €1,000,000',
+    errorAddingFunds: 'Klaida pridedant lėšas',
+    adding: 'Pridedama...',
+    fundsAdded: 'Lėšos sėkmingai pridėtos!',
+    addFundsInfo: 'Tai virtualūs pinigai praktikai prekiauti. Pridėkite bet kokią sumą, kurią norite, kad išbandytumėte savo prekybos strategijas.',
     
     // Time Travel / Simulation
     simulationDate: 'Simuliacijos data',
