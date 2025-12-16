@@ -169,6 +169,7 @@ export const translations = {
     total: 'Viso',
     insufficientFunds: 'Nepakanka lėšų',
     insufficientShares: 'Nepakanka akcijų',
+    tradingAtHistoricalDate: 'Prekiaujama istorine data',
     tradeExecuted: 'Sandoris sėkmingai įvykdytas',
     tradeFailed: 'Sandoris nepavyko',
     recentTrades: 'Naujausi sandoriai',
