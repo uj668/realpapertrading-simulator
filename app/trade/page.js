@@ -223,7 +223,7 @@ function TradePageContent() {
                 pricePerShare,
                 totalAmount,
                 timestamp: Date.now(),
-                simulationDate: simulationDate ? simulationDate.toISOString() : new Date().toISOString(),
+                simulationDate: simulationDate || new Date().toISOString().split('T')[0],
                 isHistorical: isHistorical || false,
               }),
             ]);
@@ -250,7 +250,7 @@ function TradePageContent() {
                 pricePerShare,
                 totalAmount,
                 timestamp: Date.now(),
-                simulationDate: simulationDate ? simulationDate.toISOString() : new Date().toISOString(),
+                simulationDate: simulationDate || new Date().toISOString().split('T')[0],
                 isHistorical: isHistorical || false,
               }),
             ]);
@@ -289,7 +289,7 @@ function TradePageContent() {
                 pricePerShare,
                 totalAmount,
                 timestamp: Date.now(),
-                simulationDate: simulationDate ? simulationDate.toISOString() : new Date().toISOString(),
+                simulationDate: simulationDate || new Date().toISOString().split('T')[0],
                 isHistorical: isHistorical || false,
               }),
             ]);
@@ -311,7 +311,7 @@ function TradePageContent() {
                 pricePerShare,
                 totalAmount,
                 timestamp: Date.now(),
-                simulationDate: simulationDate ? simulationDate.toISOString() : new Date().toISOString(),
+                simulationDate: simulationDate || new Date().toISOString().split('T')[0],
                 isHistorical: isHistorical || false,
               }),
             ]);
