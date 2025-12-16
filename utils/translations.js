@@ -48,6 +48,7 @@ export const translations = {
     total: 'Total',
     insufficientFunds: 'Insufficient funds',
     insufficientShares: 'Insufficient shares',
+    tradingAtHistoricalDate: 'Trading at Historical Date',
     tradeExecuted: 'Trade executed successfully',
     tradeFailed: 'Trade failed',
     recentTrades: 'Recent Trades',
