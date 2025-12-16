@@ -86,6 +86,11 @@ export default function HistoryPage() {
   
   // Generate snapshots from trades for both demo and real mode
   const snapshots = useMemo(() => {
+    // Guard: Return empty if data not ready
+    if (!trades || !initialBalance) {
+      return [];
+    }
+    
     // Try to use existing snapshots from DB first (real mode only)
     if (!demoMode && snapshotsData?.portfolioSnapshots && snapshotsData.portfolioSnapshots.length > 0) {
       return snapshotsData.portfolioSnapshots;
