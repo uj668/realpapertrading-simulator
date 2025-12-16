@@ -15,7 +15,6 @@ import AddFundsModal from '../../components/AddFundsModal';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { formatDistance, format as formatDate } from 'date-fns';
-import { id } from '@instantdb/react';
 
 export default function PortfolioPage() {
   const router = useRouter();
