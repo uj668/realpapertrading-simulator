@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../context/LanguageContext';
 import db from '../../lib/instantdb';
+import { getQuote } from '../../lib/alphaVantage';
 import Navbar from '../../components/Navbar';
 import TradeHistoryTable from '../../components/TradeHistoryTable';
 import StockPriceChart from '../../components/StockPriceChart';
@@ -99,6 +100,8 @@ export default function HistoryPage() {
       totalValue: initialBalance,
       cash: initialBalance,
       positionsValue: 0,
+      profit: 0,
+      profitPercent: 0,
     }];
     
     // Sort trades by timestamp (oldest first)
@@ -112,16 +115,55 @@ export default function HistoryPage() {
       }, 0);
       const currentCash = initialBalance + cashSpent;
       
-      // Estimate positions value (simplified - sum of all purchases minus sales)
-      const positionsValue = tradesUpToNow.reduce((sum, t) => {
-        return sum + (t.type === 'BUY' ? t.totalAmount : -t.totalAmount);
-      }, 0);
+      // Calculate position quantities and cost basis
+      const positionQty = {};
+      const positionCost = {};
+      tradesUpToNow.forEach(t => {
+        if (!positionQty[t.symbol]) {
+          positionQty[t.symbol] = 0;
+          positionCost[t.symbol] = 0;
+        }
+        if (t.type === 'BUY') {
+          positionQty[t.symbol] += t.quantity;
+          positionCost[t.symbol] += t.totalAmount;
+        } else {
+          positionQty[t.symbol] -= t.quantity;
+          // For SELL, reduce cost proportionally
+          const costPerShare = positionCost[t.symbol] / (positionQty[t.symbol] + t.quantity);
+          positionCost[t.symbol] -= costPerShare * t.quantity;
+        }
+      });
+      
+      // Calculate market value using CURRENT prices
+      let positionsValue = 0;
+      let totalCostBasis = 0;
+      Object.keys(positionQty).forEach(symbol => {
+        const qty = positionQty[symbol];
+        const cost = positionCost[symbol];
+        const currentPrice = currentPrices[symbol];
+        
+        if (qty > 0) {
+          if (currentPrice) {
+            positionsValue += qty * currentPrice; // CURRENT market value
+          } else {
+            // Fallback to cost basis if price not available yet
+            positionsValue += cost;
+          }
+          totalCostBasis += cost; // What was paid
+        }
+      });
+      
+      const totalValue = currentCash + positionsValue;
+      const profit = totalValue - initialBalance;
+      const profitPercent = initialBalance > 0 ? (profit / initialBalance) * 100 : 0;
       
       snaps.push({
         timestamp: trade.timestamp,
-        totalValue: currentCash + positionsValue,
+        totalValue,
         cash: currentCash,
-        positionsValue: positionsValue,
+        positionsValue,
+        profit,
+        profitPercent,
       });
     });
     
@@ -133,6 +175,29 @@ export default function HistoryPage() {
     ...positions.map(p => p.symbol),
     ...trades.map(t => t.symbol),
   ])];
+
+  // Fetch current prices for all symbols
+  const [currentPrices, setCurrentPrices] = useState({});
+
+  useEffect(() => {
+    const fetchPrices = async () => {
+      const prices = {};
+      for (const symbol of symbols) {
+        try {
+          const quote = await getQuote(symbol); // Current price, no date param
+          prices[symbol] = quote.price;
+        } catch (err) {
+          console.error(`Failed to fetch price for ${symbol}:`, err);
+          prices[symbol] = null;
+        }
+      }
+      setCurrentPrices(prices);
+    };
+    
+    if (symbols.length > 0) {
+      fetchPrices();
+    }
+  }, [symbols.join(',')]); // Use join to avoid infinite loop
 
   // Redirect if not authenticated (skip in demo mode)
   useEffect(() => {
