@@ -12,6 +12,7 @@ import Navbar from '../../components/Navbar';
 import PortfolioSummary from '../../components/PortfolioSummary';
 import PositionCard from '../../components/PositionCard';
 import AddFundsModal from '../../components/AddFundsModal';
+import FixDepositsModal from '../../components/FixDepositsModal';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { formatDistance, format as formatDate } from 'date-fns';
@@ -40,6 +41,7 @@ export default function PortfolioPage() {
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
+  const [fixDepositsModalOpen, setFixDepositsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
   // Fetch user data and positions from InstantDB (skip in demo mode)
@@ -176,6 +178,34 @@ export default function PortfolioPage() {
     }
   };
 
+  // Handle fixing deposits (one-time correction)
+  const handleFixDeposits = async (correctAmount) => {
+    try {
+      if (demoMode) {
+        // Update demo mode data in localStorage
+        const updatedDemoData = {
+          ...demoData,
+          totalDeposits: correctAmount,
+        };
+        setDemoData(updatedDemoData);
+        localStorage.setItem('demoData', JSON.stringify(updatedDemoData));
+      } else {
+        // Update InstantDB
+        await db.transact([
+          db.tx.users[user.id].update({
+            totalDeposits: correctAmount,
+          }),
+        ]);
+      }
+      
+      setSuccessMessage('Deposits corrected successfully! Your P/L should now be accurate.');
+      setTimeout(() => setSuccessMessage(''), 5000);
+    } catch (error) {
+      console.error('Error fixing deposits:', error);
+      throw error;
+    }
+  };
+
   // Redirect if not authenticated (skip check in demo mode)
   useEffect(() => {
     if (!demoMode && !authLoading && !user) {
@@ -239,6 +269,16 @@ export default function PortfolioPage() {
               className="bg-green-600 hover:bg-green-700"
             >
               💰 {t('addFunds')}
+            </Button>
+
+            {/* Fix Deposits Button */}
+            <Button
+              onClick={() => setFixDepositsModalOpen(true)}
+              variant="warning"
+              size="sm"
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+            >
+              🔧 Fix Deposits
             </Button>
 
             {/* Auto-refresh Toggle */}
@@ -321,6 +361,14 @@ export default function PortfolioPage() {
         onClose={() => setAddFundsModalOpen(false)}
         onAddFunds={handleAddFunds}
         currentBalance={cash}
+      />
+
+      {/* Fix Deposits Modal */}
+      <FixDepositsModal
+        isOpen={fixDepositsModalOpen}
+        onClose={() => setFixDepositsModalOpen(false)}
+        onFixDeposits={handleFixDeposits}
+        currentTotalDeposits={totalDeposits}
       />
     </div>
   );
