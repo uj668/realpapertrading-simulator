@@ -43,7 +43,7 @@ export default function PortfolioPage() {
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
   const [recoveryModalOpen, setRecoveryModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [showRecoveryButton, setShowRecoveryButton] = useState(false);
+  const [showRecoveryButton, setShowRecoveryButton] = useState(true); // Always show for now
 
   // Fetch user data and positions from InstantDB (skip in demo mode)
   const { data: userData } = db.useQuery(
