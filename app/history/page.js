@@ -76,7 +76,7 @@ export default function HistoryPage() {
 
   // Fetch positions for symbol list (skip in demo mode)
   const { data: positionsData } = db.useQuery(
-    user && !demoMode ? { positions: { $: { where: { id: user.id } } } } : null
+    user && !demoMode ? { positions: { $: { where: { userId: user.id } } } } : null
   );
 
   const userProfile = demoMode ? demoData : (userData?.users?.[0] || null);
