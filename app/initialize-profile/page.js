@@ -36,8 +36,9 @@ export default function InitializeProfilePage() {
   useEffect(() => {
     if (!dataLoading && userData?.users?.[0]) {
       const existingProfile = userData.users[0];
-      if (existingProfile.initialBalance && existingProfile.username) {
-        console.log('Profile already exists, redirecting to portfolio...');
+      // Check if profile has createdAt (indicates it was previously initialized)
+      if (existingProfile.createdAt) {
+        console.log('[InitProfile] Profile already exists with createdAt, redirecting to portfolio...');
         router.push('/portfolio');
       }
     }
@@ -53,15 +54,16 @@ export default function InitializeProfilePage() {
         throw new Error('No authenticated user found');
       }
 
-      // Check if profile already exists
+      // CRITICAL: Check if profile already exists to prevent data loss
       const existingProfile = userData?.users?.[0];
-      if (existingProfile?.initialBalance) {
-        setError('Profile already initialized!');
+      if (existingProfile?.createdAt) {
+        console.error('[InitProfile] BLOCKED: Attempted to overwrite existing profile!');
+        setError('Profile already exists! Redirecting to portfolio to protect your data...');
         setTimeout(() => router.push('/portfolio'), 2000);
         return;
       }
 
-      console.log('Initializing profile for user:', user.id);
+      console.log('[InitProfile] Creating NEW profile for user:', user.id);
 
       // Create/update user profile with initial data
       await db.transact([
@@ -74,7 +76,7 @@ export default function InitializeProfilePage() {
         }),
       ]);
 
-      console.log('Profile initialized successfully!');
+      console.log('[InitProfile] Profile initialized successfully!');
       setSuccess(true);
 
       // Wait a moment for InstantDB to sync, then redirect
@@ -82,7 +84,7 @@ export default function InitializeProfilePage() {
         router.push('/portfolio');
       }, 1500);
     } catch (err) {
-      console.error('Error initializing profile:', err);
+      console.error('[InitProfile] Error initializing profile:', err);
       setError(err.message || 'Failed to initialize profile. Please try again.');
     } finally {
       setInitializing(false);

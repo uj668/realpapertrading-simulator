@@ -41,6 +41,7 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(true);
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showRecoveryButton, setShowRecoveryButton] = useState(false);
 
   // Fetch user data and positions from InstantDB (skip in demo mode)
   const { data: userData } = db.useQuery(
@@ -49,6 +50,20 @@ export default function PortfolioPage() {
 
   const { data: positionsData } = db.useQuery(
     user && !demoMode ? { positions: { $: { where: { userId: user.id } } } } : null
+  );
+
+  // Fetch trades to detect data inconsistencies (skip in demo mode)
+  const { data: tradesData } = db.useQuery(
+    user && !demoMode
+      ? { 
+          trades: { 
+            $: { 
+              where: { userId: user.id },
+              limit: 1 // Just need to know if trades exist
+            } 
+          } 
+        } 
+      : null
   );
 
   // Demo mode data
@@ -72,6 +87,22 @@ export default function PortfolioPage() {
   const cash = demoMode ? demoData.cash : (userProfile?.currentCash || 10000);
   const initialBalance = demoMode ? demoData.initialBalance : (userProfile?.initialBalance || 10000);
   const totalDeposits = demoMode ? (demoData.totalDeposits || 0) : (userProfile?.totalDeposits || 0);
+
+  // Detect data inconsistencies (trades exist but no positions)
+  useEffect(() => {
+    if (!demoMode && tradesData && positionsData) {
+      const hasTrades = tradesData.trades && tradesData.trades.length > 0;
+      const hasPositions = positionsData.positions && positionsData.positions.length > 0;
+      
+      // If user has trades but no positions, data might be inconsistent
+      if (hasTrades && !hasPositions) {
+        console.log('[Portfolio] Data inconsistency detected: trades exist but no positions');
+        setShowRecoveryButton(true);
+      } else {
+        setShowRecoveryButton(false);
+      }
+    }
+  }, [demoMode, tradesData, positionsData]);
 
   // Fetch current or historical prices for all positions
   const fetchPrices = async () => {
@@ -231,6 +262,18 @@ export default function PortfolioPage() {
           <h1 className="text-3xl font-bold text-gray-900">{t('portfolio')}</h1>
           
           <div className="flex items-center space-x-4">
+            {/* Data Recovery Button (only shown when inconsistency detected) */}
+            {showRecoveryButton && (
+              <Button
+                onClick={() => router.push('/recover-data')}
+                variant="warning"
+                size="sm"
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                🔧 Recover Data
+              </Button>
+            )}
+
             {/* Add Funds Button */}
             <Button
               onClick={() => setAddFundsModalOpen(true)}

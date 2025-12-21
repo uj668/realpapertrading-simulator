@@ -26,10 +26,43 @@ function VerifyPageContent() {
       // Verify the magic code
       await db.auth.signInWithMagicCode({ email, code });
       
-      // Redirect to profile initialization page
-      // The profile will be created there after auth state is fully updated
-      router.push('/initialize-profile');
+      console.log('[Verify] Magic code verified successfully');
+      
+      // Wait a moment for auth state to update
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Get the current user after auth
+      const currentUser = db.auth.user;
+      
+      if (!currentUser) {
+        console.error('[Verify] No user found after sign in');
+        throw new Error('Authentication failed - please try again');
+      }
+      
+      console.log('[Verify] Checking if profile exists for user:', currentUser.id);
+      
+      // Check if user profile already exists
+      const { data } = await db.queryOnce({
+        users: {
+          $: {
+            where: { id: currentUser.id }
+          }
+        }
+      });
+      
+      const existingProfile = data?.users?.[0];
+      
+      if (existingProfile && existingProfile.createdAt) {
+        // Existing user - redirect to portfolio
+        console.log('[Verify] Existing profile found, redirecting to portfolio');
+        router.push('/portfolio');
+      } else {
+        // New user - redirect to profile initialization
+        console.log('[Verify] No profile found, redirecting to initialize-profile');
+        router.push('/initialize-profile');
+      }
     } catch (err) {
+      console.error('[Verify] Error:', err);
       setError(err.message || 'Invalid code. Please try again.');
     } finally {
       setLoading(false);
