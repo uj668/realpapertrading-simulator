@@ -12,6 +12,7 @@ import Navbar from '../../components/Navbar';
 import PortfolioSummary from '../../components/PortfolioSummary';
 import PositionCard from '../../components/PositionCard';
 import AddFundsModal from '../../components/AddFundsModal';
+import RecoveryModal from '../../components/RecoveryModal';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { formatDistance, format as formatDate } from 'date-fns';
@@ -40,6 +41,7 @@ export default function PortfolioPage() {
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
+  const [recoveryModalOpen, setRecoveryModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [showRecoveryButton, setShowRecoveryButton] = useState(false);
 
@@ -265,7 +267,7 @@ export default function PortfolioPage() {
             {/* Data Recovery Button (only shown when inconsistency detected) */}
             {showRecoveryButton && (
               <Button
-                onClick={() => router.push('/recover-data')}
+                onClick={() => setRecoveryModalOpen(true)}
                 variant="warning"
                 size="sm"
                 className="bg-orange-600 hover:bg-orange-700 text-white"
@@ -364,6 +366,16 @@ export default function PortfolioPage() {
         onClose={() => setAddFundsModalOpen(false)}
         onAddFunds={handleAddFunds}
         currentBalance={cash}
+      />
+
+      {/* Recovery Modal */}
+      <RecoveryModal
+        isOpen={recoveryModalOpen}
+        onClose={() => setRecoveryModalOpen(false)}
+        user={user}
+        tradesData={tradesData}
+        positionsData={positionsData}
+        userData={userData}
       />
     </div>
   );
