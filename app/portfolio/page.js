@@ -229,6 +229,33 @@ export default function PortfolioPage() {
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* RECOVERY BANNER - ALWAYS VISIBLE */}
+        {!demoMode && (
+          <div className="mb-6 bg-red-50 border-2 border-red-500 rounded-lg p-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-bold text-red-900 mb-2">
+                  🔧 DATA RECOVERY AVAILABLE
+                </h3>
+                <p className="text-sm text-red-800 mb-2">
+                  Your trades exist but positions are missing. Click below to recover your data.
+                </p>
+                <p className="text-xs text-red-700">
+                  This will recalculate your portfolio from your trade history.
+                </p>
+              </div>
+              <Button
+                onClick={() => setRecoveryModalOpen(true)}
+                variant="warning"
+                size="lg"
+                className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 text-lg"
+              >
+                🔧 RECOVER MY DATA
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Historical Mode Banner */}
         {isHistoricalMode && simulationDate && (
           <div className="mb-6 bg-orange-50 border border-orange-200 rounded-lg p-4 flex justify-between items-center">
