@@ -20,6 +20,8 @@ export default function RecoverDataPage() {
   const [success, setSuccess] = useState(false);
   const [analysisData, setAnalysisData] = useState(null);
 
+  console.log('[RecoverData] Page loaded');
+
   // Fetch user data
   const { data: userData } = db.useQuery(
     user ? { users: { $: { where: { id: user.id } } } } : null
